@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <title>Istorija igrača</title>
+    <!-- Uključivanje Supabase biblioteke -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Uključivanje Chart.js biblioteke za grafikone -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Uključivanje vašeg JavaScript fajla -->
+    <script src="history.js" defer></script>
+    <style>
+        /* Dodajte stilove po potrebi */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #chart-container {
+            max-width: 800px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="player-name">Istorija igrača</h1>
+    <div id="chart-container">
+        <canvas id="trainingChart"></canvas>
+    </div>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistika Kluba</title>
+    <!-- Uključivanje Supabase biblioteke -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Uključivanje vašeg JavaScript fajla -->
+    <script src="club.js" defer></script>
+    <style>
+        /* Dodajte stilove po potrebi */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .player-list li {
+            margin-bottom: 10px;
+        }
+        .player-list button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="club-name">Statistika Kluba</h1>
+
+        <!-- Tabela za statistiku treninga -->
+        <h3>Statistika Treninga</h3>
+        <table id="training-stats-table">
+            <thead>
+                <tr>
+                    <th>Ime igrača</th>
+                    <th>Broj treninga</th>
+                    <th>Prosečan broj bacanja</th>
+                    <th>Prosečan broj promašaja</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Podaci će biti dinamički dodati -->
+            </tbody>
+        </table>
+
+        <!-- Tabela za statistiku utakmica -->
+        <h3>Statistika Utakmica</h3>
+        <table id="match-stats-table">
+            <thead>
+                <tr>
+                    <th>Ime igrača</th>
+                    <th>Broj utakmica</th>
+                    <th>Prosečan rezultat</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Podaci će biti dinamički dodati -->
+            </tbody>
+        </table>
+
+        <!-- Sekcija za listu igrača -->
+        <h3>Lista igrača</h3>
+        <ul id="players-list" class="player-list"></ul>
+
+        <!-- Sekcija za dodavanje igrača (samo za administratore) -->
+        <div id="add-player-section" class="hidden">
+            <h3>Dodaj novog igrača</h3>
+            <form id="add-player-form">
+                <input type="text" id="player-name" placeholder="Ime igrača" required />
+                <button type="submit">Dodaj igrača</button>
+            </form>
+        </div>
+
+        <!-- Sekcija za dodavanje treninga (samo za administratore) -->
+        <div id="add-training-section" class="hidden">
+            <h3>Dodaj trening</h3>
+            <form id="add-training-form">
+                <select id="player-select" required>
+                    <option value="">Izaberite igrača</option>
+                </select>
+                <input type="number" id="training-throws" placeholder="Broj bacanja" min="0" required />
+                <input type="number" id="training-misses" placeholder="Broj promašaja" min="0" required />
+                <input type="date" id="training-date" required />
+                <button type="submit">Dodaj trening</button>
+            </form>
+        </div>
+
+        <!-- Sekcija za dodavanje utakmice (samo za administratore) -->
+        <div id="add-match-section" class="hidden">
+            <h3>Dodaj utakmicu</h3>
+            <form id="add-match-form">
+                <input type="date" id="match-date" required />
+                <div id="match-players">
+                    <!-- Dinamički dodati igrači -->
+                </div>
+                <button type="button" id="add-player-to-match">Dodaj igrača</button>
+                <button type="submit">Dodaj utakmicu</button>
+            </form>
+        </div>
+
+        <!-- Dugme za odjavu (samo za administratore) -->
+        <button id="logoutButton" class="hidden">Odjavi se</button>
+    </div>
+</body>
+</html>
