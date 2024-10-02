@@ -1,0 +1,24 @@
+name: Deploy to Supabase
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Supabase CLI
+      run: |
+        curl -L https://github.com/supabase/cli/releases/download/v1.0.0/supabase_linux_amd64 > /usr/local/bin/supabase
+        chmod +x /usr/local/bin/supabase
+
+    - name: Deploy to Supabase
+      run: |
+        supabase db push
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
