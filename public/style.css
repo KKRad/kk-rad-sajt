@@ -28,7 +28,23 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #45a049; /* Tamnija nijansa zelene pri hover */
+}
+
+.club-button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-size: 1.5em;
+    color: #fff;
+    background-color: #333;
+    text-decoration: none;
+    border-radius: 5px;
+    width: 200px;
+}
+
+.club-button:hover {
+    background-color: #555;
 }
 
 table {
@@ -47,10 +63,10 @@ th, td {
 }
 
 th {
-    background-color: #004080;
+    background-color: #004080; /* Tamno plava boja za zaglavlja */
     color: white;
 }
 
 tr:nth-child(even) {
-    background-color: #f2f2f2;
+    background-color: #f2f2f2; /* Svetlo siva pozadina za parne redove */
 }

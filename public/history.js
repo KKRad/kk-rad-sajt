@@ -1,8 +1,18 @@
 // history.js
-const supabaseUrl = 'https://piykumcyaqnyxwndozhb.supabase.co'; // Vaš Supabase URL
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpeWt1bWN5YXFueXh3bmRvemhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc2OTk2MTMsImV4cCI6MjA0MzI3NTYxM30.eqh0FPRGtqD3A9DLeJv6yZKXP6pnaygDTaaa2bgz3Xs'; // Ovdje ubacite vaš Anon Public Key
 
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -14,36 +24,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    const { data: player, error: playerError } = await supabase
-        .from('players')
-        .select('*')
-        .eq('id', playerId)
-        .single();
-
-    if (playerError || !player) {
+    // Učitavanje podataka o igraču
+    const playerSnapshot = await db.collection('players').doc(playerId).get();
+    if (!playerSnapshot.exists) {
         alert('Greška prilikom učitavanja igrača.');
-        console.error(playerError);
         return;
     }
 
+    const player = playerSnapshot.data();
     document.getElementById('player-name').textContent = `Istorija igrača: ${player.name}`;
 
-    const { data: trainings, error: trainingsError } = await supabase
-        .from('trainings')
-        .select('*')
-        .eq('player_id', playerId)
-        .order('date', { ascending: true });
+    // Učitavanje treninga igrača
+    const trainingsSnapshot = await db.collection('trainings').where('player_id', '==', playerId).get();
 
-    if (trainingsError) {
-        alert('Greška prilikom učitavanja treninga.');
-        console.error(trainingsError);
-        return;
-    }
+    const dates = [];
+    const throws = [];
+    const misses = [];
 
-    const dates = trainings.map(t => t.date);
-    const throws = trainings.map(t => t.throws);
-    const misses = trainings.map(t => t.misses);
+    trainingsSnapshot.forEach(doc => {
+        const data = doc.data();
+        dates.push(data.date);
+        throws.push(data.throws);
+        misses.push(data.misses);
+    });
 
+    // Kreiranje grafikona
     const ctx = document.getElementById('trainingChart').getContext('2d');
     const trainingChart = new Chart(ctx, {
         type: 'line',

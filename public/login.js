@@ -1,28 +1,37 @@
 // login.js
 
-// Vaš Supabase URL i Anon Public Key
-const supabaseUrl = 'https://piykumcyaqnyxwndozhb.supabase.co'; // Vaš Supabase URL
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpeWt1bWN5YXFueXh3bmRvemhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc2OTk2MTMsImV4cCI6MjA0MzI3NTYxM30.eqh0FPRGtqD3A9DLeJv6yZKXP6pnaygDTaaa2bgz3Xs'; // Ovdje ubacite vaš Anon Public Key
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDrKQZL9m8-aupCgBZquJ8e2kPjIOTQlNo", // Vaš API ključ
+    authDomain: "kk-rad.firebaseapp.com", // Vaš projekt ID
+    projectId: "kk-rad", // Vaš projekt ID
+    storageBucket: "kk-rad.appspot.com", // Vaš storage bucket
+    messagingSenderId: "704912800301", // Vaš sender ID
+    appId: "1:704912800301:web:828d786d31f7aad15756a4", // Vaš app ID
+    measurementId: "G-7LFZWW07G6" // Vaš measurement ID
+};
 
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+// Inicijalizacija Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth(); // Firebase Auth instanca
 
 // Funkcija za prijavu
 async function login() {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-    });
+    try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
 
-    if (error) {
+        console.log("Prijava uspešna:", user);
+        // Preusmeravanje na stranicu kluba ili na početnu stranu
+        window.location.href = "index.html"; // Preusmeravanje na izbor kluba
+    } catch (error) {
         console.error("Greška prilikom prijave:", error);
         alert("Greška: " + error.message);
-    } else {
-        console.log("Prijava uspešna", data.user);
-        window.location.href = "club.html?club=KK_RAD";
     }
 }
 
+// Dodajte event listener za dugme za prijavu
 document.getElementById('loginButton').addEventListener('click', login);

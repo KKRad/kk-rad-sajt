@@ -3,26 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Istorija Igrača</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="history.js" defer></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-        }
-        #chart-container {
-            max-width: 800px;
-            margin: auto;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1 id="player-name">Istorija Igrača</h1>
-    <div id="chart-container">
+    <div id="chart-container" style="max-width: 800px; margin: auto;">
         <canvas id="trainingChart"></canvas>
     </div>
 </body>

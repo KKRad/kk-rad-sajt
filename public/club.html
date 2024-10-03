@@ -3,51 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Statistika Kluba</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="club.js" defer></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        h1, h2, h3 {
-            text-align: center;
-        }
-        .hidden {
-            display: none;
-        }
-        .container {
-            max-width: 1000px;
-            margin: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .player-list li {
-            margin-bottom: 10px;
-        }
-        .player-list button {
-            margin-left: 10px;
-        }
-    </style>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js"></script>
+    <script type="module" src="club.js" defer></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <h1 id="club-name">Statistika Kluba</h1>
 
-        <!-- Tabela za statistiku treninga -->
         <h3>Statistika Treninga</h3>
         <table id="training-stats-table">
             <thead>
@@ -58,12 +23,9 @@
                     <th>Prosečan broj promašaja</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Podaci će biti dinamički dodati -->
-            </tbody>
+            <tbody></tbody>
         </table>
 
-        <!-- Tabela za statistiku utakmica -->
         <h3>Statistika Utakmica</h3>
         <table id="match-stats-table">
             <thead>
@@ -73,12 +35,9 @@
                     <th>Prosečan rezultat</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Podaci će biti dinamički dodati -->
-            </tbody>
+            <tbody></tbody>
         </table>
 
-        <!-- Sekcija za listu igrača -->
         <h3>Lista igrača</h3>
         <ul id="players-list" class="player-list"></ul>
 

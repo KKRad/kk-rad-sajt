@@ -1,130 +1,104 @@
 // club.js
 
-// Vaš Supabase URL i Anon Public Key
-const supabaseUrl = 'https://piykumcyaqnyxwndozhb.supabase.co'; // Vaš Supabase URL
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpeWt1bWN5YXFueXh3bmRvemhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc2OTk2MTMsImV4cCI6MjA0MzI3NTYxM30.eqh0FPRGtqD3A9DLeJv6yZKXP6pnaygDTaaa2bgz3Xs'; // Ovdje ubacite vaš Anon Public Key
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDrKQZL9m8-aupCgBZquJ8e2kPjIOTQlNo", // Vaš API ključ
+    authDomain: "kk-rad.firebaseapp.com", // Vaš projekt ID
+    projectId: "kk-rad", // Vaš projekt ID
+    storageBucket: "kk-rad.appspot.com", // Vaš storage bucket
+    messagingSenderId: "704912800301", // Vaš sender ID
+    appId: "1:704912800301:web:828d786d31f7aad15756a4", // Vaš app ID
+    measurementId: "G-7LFZWW07G6" // Vaš measurement ID
+};
 
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+// Inicijalizacija Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Preuzimanje parametra 'club' iz URL-a
     const urlParams = new URLSearchParams(window.location.search);
     const clubName = urlParams.get('club');
 
     if (!clubName) {
         alert('Nije izabran klub.');
-        window.location.href = 'index.html';
+        window.location.href = 'index.html'; // Preusmerite korisnika nazad na index
         return;
     }
 
     document.getElementById('club-name').textContent = `Statistika za klub: ${clubName}`;
 
-    // Učitavanje kluba iz baze podataka
-    const { data: club, error: clubError } = await supabase
-        .from('clubs')
-        .select('*')
-        .eq('name', clubName)
-        .single();
-
-    if (clubError || !club) {
+    // Učitavanje kluba iz Firestore
+    const clubSnapshot = await db.collection('clubs').where('name', '==', clubName).get();
+    if (clubSnapshot.empty) {
         alert('Greška prilikom učitavanja kluba.');
-        console.error(clubError);
         return;
     }
 
-    const clubId = club.id;
+    const clubId = clubSnapshot.docs[0].id; // uzimamo ID kluba za kasniju upotrebu
 
     // Proveri da li je korisnik prijavljen
-    const { data: { user } } = await supabase.auth.getUser();
+    firebase.auth().onAuthStateChanged(async (user) => {
+        if (user && user.email === 'kkradbrcko9@gmail.com') {
+            // Prikaži administratorske funkcije
+            document.getElementById('add-match-section').classList.remove('hidden');
+            document.getElementById('logoutButton').classList.remove('hidden');
 
-    if (user && user.email === 'kkradbrcko9@gmail.com') {
-        // Prikaži administratorske funkcije
-        document.getElementById('add-player-section').classList.remove('hidden');
-        document.getElementById('add-training-section').classList.remove('hidden');
-        document.getElementById('add-match-section').classList.remove('hidden');
-        document.getElementById('logoutButton').classList.remove('hidden');
-
-        // Poveži dugme za odjavu
-        document.getElementById('logoutButton').addEventListener('click', async () => {
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-                alert('Greška prilikom odjave: ' + error.message);
-            } else {
+            // Poveži dugme za odjavu
+            document.getElementById('logoutButton').addEventListener('click', async () => {
+                await firebase.auth().signOut();
                 window.location.reload();
-            }
-        });
-    }
+            });
+        }
 
-    // Učitaj igrače i statistike
-    await loadPlayersAndStats();
+        // Učitaj igrače i statistike
+        await loadPlayersAndStats();
+    });
 
     // Funkcija za učitavanje igrača i statistika
     async function loadPlayersAndStats() {
         // Učitavanje igrača
-        const { data: players, error: playersError } = await supabase
-            .from('players')
-            .select('*')
-            .eq('club_id', clubId);
+        const playersSnapshot = await db.collection('players').where('club_id', '==', clubId).get();
 
-        if (playersError) {
-            console.error('Greška prilikom učitavanja igrača:', playersError);
-            return;
-        }
+        const players = playersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // Ažuriranje liste igrača
-        updatePlayerList(players);
-        updatePlayerSelect(players);
+        updatePlayerList(players); // Ažurira listu igrača
+        updatePlayerSelect(players); // Ažurira izbor igrača
 
         // Učitavanje statistike treninga
-        const { data: trainingStats, error: trainingStatsError } = await supabase
-            .from('trainings')
-            .select('player_id, throws, misses')
-            .in('player_id', players.map(p => p.id));
+        const trainingStatsSnapshot = await db.collection('trainings').where('player_id', 'in', players.map(p => p.id)).get();
 
-        if (trainingStatsError) {
-            console.error('Greška prilikom učitavanja statistike treninga:', trainingStatsError);
-            return;
-        }
-
-        // Učitavanje statistike utakmica
-        const { data: matchStats, error: matchStatsError } = await supabase
-            .from('match_results')
-            .select('player_id, score')
-            .in('player_id', players.map(p => p.id));
-
-        if (matchStatsError) {
-            console.error('Greška prilikom učitavanja statistike utakmica:', matchStatsError);
-            return;
-        }
-
-        // Generisanje statistike treninga po igraču
         const trainingStatsByPlayer = {};
-        trainingStats.forEach(stat => {
-            if (!trainingStatsByPlayer[stat.player_id]) {
-                trainingStatsByPlayer[stat.player_id] = {
+        trainingStatsSnapshot.forEach(stat => {
+            const data = stat.data();
+            if (!trainingStatsByPlayer[data.player_id]) {
+                trainingStatsByPlayer[data.player_id] = {
                     totalThrows: 0,
                     totalMisses: 0,
-                    trainingCount: 0,
+                    trainingCount: 0
                 };
             }
-            trainingStatsByPlayer[stat.player_id].totalThrows += stat.throws;
-            trainingStatsByPlayer[stat.player_id].totalMisses += stat.misses;
-            trainingStatsByPlayer[stat.player_id].trainingCount += 1;
+            trainingStatsByPlayer[data.player_id].totalThrows += data.throws;
+            trainingStatsByPlayer[data.player_id].totalMisses += data.misses;
+            trainingStatsByPlayer[data.player_id].trainingCount += 1;
         });
 
-        // Generisanje statistike utakmica po igraču
+        // Učitavanje statistike utakmica
+        const matchStatsSnapshot = await db.collection('match_results').where('player_id', 'in', players.map(p => p.id)).get();
+
         const matchStatsByPlayer = {};
-        matchStats.forEach(stat => {
-            if (!matchStatsByPlayer[stat.player_id]) {
-                matchStatsByPlayer[stat.player_id] = {
+        matchStatsSnapshot.forEach(stat => {
+            const data = stat.data();
+            if (!matchStatsByPlayer[data.player_id]) {
+                matchStatsByPlayer[data.player_id] = {
                     totalScore: 0,
-                    matchCount: 0,
+                    matchCount: 0
                 };
             }
-            matchStatsByPlayer[stat.player_id].totalScore += stat.score;
-            matchStatsByPlayer[stat.player_id].matchCount += 1;
+            matchStatsByPlayer[data.player_id].totalScore += data.score;
+            matchStatsByPlayer[data.player_id].matchCount += 1;
         });
-
+        
         // Ažuriranje tabela sa statistikom
         updateTrainingStatsTable(players, trainingStatsByPlayer);
         updateMatchStatsTable(players, matchStatsByPlayer);
@@ -133,16 +107,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Funkcija za ažuriranje tabele statistike treninga
     function updateTrainingStatsTable(players, trainingStatsByPlayer) {
         const trainingStatsTableBody = document.querySelector('#training-stats-table tbody');
-        trainingStatsTableBody.innerHTML = '';
+        trainingStatsTableBody.innerHTML = ''; // Očisti postojeće redove
 
         players.forEach(player => {
-            const stats = trainingStatsByPlayer[player.id];
+            const stats = trainingStatsByPlayer[player.id] || {
+                totalThrows: 0,
+                totalMisses: 0,
+                trainingCount: 0
+            };
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${player.name}</td>
-                <td>${stats ? stats.trainingCount : 0}</td>
-                <td>${stats && stats.trainingCount > 0 ? (stats.totalThrows / stats.trainingCount).toFixed(2) : 0}</td>
-                <td>${stats && stats.trainingCount > 0 ? (stats.totalMisses / stats.trainingCount).toFixed(2) : 0}</td>
+                <td>${stats.trainingCount}</td>
+                <td>${stats.trainingCount > 0 ? (stats.totalThrows / stats.trainingCount).toFixed(2) : 0}</td>
+                <td>${stats.trainingCount > 0 ? (stats.totalMisses / stats.trainingCount).toFixed(2) : 0}</td>
             `;
             trainingStatsTableBody.appendChild(tr);
         });
@@ -151,15 +130,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Funkcija za ažuriranje tabele statistike utakmica
     function updateMatchStatsTable(players, matchStatsByPlayer) {
         const matchStatsTableBody = document.querySelector('#match-stats-table tbody');
-        matchStatsTableBody.innerHTML = '';
+        matchStatsTableBody.innerHTML = ''; // Očisti postojeće redove
 
         players.forEach(player => {
-            const stats = matchStatsByPlayer[player.id];
+            const stats = matchStatsByPlayer[player.id] || {
+                totalScore: 0,
+                matchCount: 0
+            };
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${player.name}</td>
-                <td>${stats ? stats.matchCount : 0}</td>
-                <td>${stats && stats.matchCount > 0 ? (stats.totalScore / stats.matchCount).toFixed(2) : 0}</td>
+                <td>${stats.matchCount}</td>
+                <td>${stats.matchCount > 0 ? (stats.totalScore / stats.matchCount).toFixed(2) : 0}</td>
             `;
             matchStatsTableBody.appendChild(tr);
         });
@@ -188,16 +171,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 deleteButton.textContent = 'Obriši';
                 deleteButton.addEventListener('click', async () => {
                     if (confirm(`Da li ste sigurni da želite da obrišete igrača ${player.name}?`)) {
-                        const { error } = await supabase
-                            .from('players')
-                            .delete()
-                            .eq('id', player.id);
-
-                        if (error) {
-                            alert('Greška prilikom brisanja igrača: ' + error.message);
-                        } else {
-                            loadPlayersAndStats();
-                        }
+                        // Brisanje igrača iz Firestore
+                        await db.collection('players').doc(player.id).delete()
+                            .then(() => {
+                                alert('Igrač uspešno obrisan!');
+                                loadPlayersAndStats(); // Ponovno učitavanje igrača
+                            })
+                            .catch((error) => {
+                                alert('Greška prilikom brisanja igrača: ' + error.message);
+                            });
                     }
                 });
                 li.appendChild(deleteButton);
@@ -227,16 +209,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         const playerName = document.getElementById('player-name').value.trim();
 
         if (playerName) {
-            const { error } = await supabase
-                .from('players')
-                .insert([{ name: playerName, club_id: clubId }]);
+            const { error } = await db.collection('players').add({
+                name: playerName,
+                club_id: clubId // Povezivanje igrača s klubom
+            });
 
             if (error) {
                 alert('Greška prilikom dodavanja igrača: ' + error.message);
             } else {
                 alert('Igrač uspešno dodat!');
                 addPlayerForm.reset();
-                loadPlayersAndStats();
+                loadPlayersAndStats(); // Ponovo učitajte igrače i statistike
             }
         } else {
             alert('Molimo unesite ime igrača.');
@@ -253,16 +236,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const date = document.getElementById('training-date').value;
 
         if (playerId && !isNaN(throws) && !isNaN(misses) && date) {
-            const { error } = await supabase
-                .from('trainings')
-                .insert([{ player_id: playerId, throws: throws, misses: misses, date: date }]);
+            const { error } = await db.collection('trainings').add({
+                player_id: playerId,
+                throws: throws,
+                misses: misses,
+                date: date
+            });
 
             if (error) {
                 alert('Greška prilikom dodavanja treninga: ' + error.message);
             } else {
                 alert('Trening uspešno dodat!');
                 addTrainingForm.reset();
-                loadPlayersAndStats();
+                loadPlayersAndStats(); // Ponovo učitajte igrače i statistike
             }
         } else {
             alert('Molimo popunite sva polja ispravno.');
@@ -310,7 +296,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const playerDiv = document.createElement('div');
         playerDiv.appendChild(playerSelectClone);
         playerDiv.appendChild(scoreInput);
-
         matchPlayersDiv.appendChild(playerDiv);
     }
 
@@ -323,20 +308,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Kreiranje utakmice
-        const { data: matchData, error: matchError } = await supabase
-            .from('matches')
-            .insert([{ club_id: clubId, date: date }])
-            .select();
+        // Kreiranje nove utakmice
+        const { id: matchId } = await db.collection('matches').add({
+            club_id: clubId,
+            date: date
+        });
 
-        if (matchError) {
-            alert('Greška prilikom dodavanja utakmice: ' + matchError.message);
-            return;
-        }
-
-        const matchId = matchData[0].id;
-
-        // Prikupljanje rezultata igrača
+        // Prikupljanje rezultata igrača za utakmicu
         const matchPlayers = matchPlayersDiv.children;
         let matchResults = [];
 
@@ -355,22 +333,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        // Unos rezultata utakmice
-        const { error: resultsError } = await supabase
-            .from('match_results')
-            .insert(matchResults);
+        // Unos rezultata utakmice u Firestore
+        const { error: resultsError } = await db.collection('match_results').add(matchResults);
 
         if (resultsError) {
             alert('Greška prilikom dodavanja rezultata utakmice: ' + resultsError.message);
         } else {
             alert('Utakmica uspešno dodata!');
             addMatchForm.reset();
-            matchPlayersDiv.innerHTML = '';
-            matchPlayerCount = 0;
-            loadPlayersAndStats();
+            matchPlayersDiv.innerHTML = ''; // Očisti selekciju igrača
+            matchPlayerCount = 0; // Resetuj brojač igrača
+            loadPlayersAndStats(); // Osvježavanje statistike nakon dodavanja utakmice
         }
     });
 });
-
-
-
