@@ -2,11 +2,13 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     color: #333;
-    margin: 20px;
+    margin: 0;
+    padding: 0;
 }
 
 h1, h2, h3 {
-    color: #004080; /* Tamno plava boja */
+    color: #004080;
+    text-align: center;
 }
 
 a {
@@ -14,10 +16,9 @@ a {
     text-decoration: none;
 }
 
-.club-selection button, 
 button {
-    background-color: #4CAF50; /* Zeleno */
-    color: white; /* Belo slovo */
+    background-color: #4CAF50;
+    color: white;
     padding: 10px 15px;
     margin-top: 10px;
     border: none;
@@ -26,9 +27,8 @@ button {
     font-size: 16px;
 }
 
-.club-selection button:hover, 
 button:hover {
-    background-color: #45a049; /* Tamnija zelena na hover */
+    background-color: #45a049;
 }
 
 table {
@@ -47,10 +47,10 @@ th, td {
 }
 
 th {
-    background-color: #004080; /* Tamno plava boja za zaglavlja */
+    background-color: #004080;
     color: white;
 }
 
 tr:nth-child(even) {
-    background-color: #f2f2f2; /* Svetlo siva pozadina za parne redove */
+    background-color: #f2f2f2;
 }

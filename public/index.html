@@ -3,42 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Izbor Kluba</title>
-    <!-- Uključivanje Supabase biblioteke ako je potrebno -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Uključivanje vašeg JavaScript koda direktno u `index.html` -->
     <style>
-        /* Stilovi */
         body {
             font-family: Arial, sans-serif;
+            text-align: center;
             padding: 20px;
         }
-        h1 {
-            text-align: center;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            margin: 15px 0;
-            text-align: center;
-        }
-        a.club-link {
-            text-decoration: none;
-            font-size: 1.2em;
-            color: #333;
-            padding: 10px 20px;
-            border: 2px solid #333;
-            border-radius: 5px;
-        }
-        a.club-link:hover {
-            background-color: #333;
-            color: #fff;
-        }
-        .admin-login {
+        a.club-button {
             display: block;
-            text-align: center;
-            margin-top: 30px;
+            margin: 20px;
+            padding: 10px 20px;
+            font-size: 1.5em;
+            color: #fff;
+            background-color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        a.club-button:hover {
+            background-color: #555;
         }
     </style>
 </head>
@@ -47,25 +32,21 @@
 <h1>Izaberite Klub</h1>
 <ul id="club-list"></ul>
 
-<!-- Dugme za prijavu kao administrator -->
 <a href="login.html" class="admin-login">Prijavi se kao administrator</a>
 
-<!-- Vaš JavaScript kod -->
 <script>
-    // Inicijalizacija Supabase klijenta (ako je potrebno)
-    // Zamenite sa svojim Supabase URL-om i Anon Public Key-jem
-    const supabaseUrl = 'https://piykumcyaqnyxwndozhb.supabase.co'; // Vaš Supabase URL
-    const supabaseKey = 'VAŠ_ANON_PUBLIC_KEY'; // Vaš Anon Public Key
-
+    // Inicijalizacija Supabase klijenta
+    const supabaseUrl = 'https://piykumcyaqnyxwndozhb.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUz...'; // Vaš Anon Public Key
     const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
     document.addEventListener('DOMContentLoaded', async () => {
-        // Definišite klubove koje želite da prikažete
-        const clubs = [
-            { name: 'KK RAD', link: 'club.html?club=KK_RAD' },
-            { name: 'KK RAD', link: 'club.html?club=KK_RAD2' },
-            { name: 'ŽKK OLIMP', link: 'club.html?club=ŽKK_OLIMP' },
-        ];
+        const { data: clubs, error } = await supabase.from('clubs').select('*');
+
+        if (error) {
+            console.error("Greška prilikom učitavanja klubova:", error.message);
+            return;
+        }
 
         const clubList = document.getElementById('club-list');
 
@@ -73,8 +54,8 @@
             const li = document.createElement('li');
             const a = document.createElement('a');
             a.textContent = club.name;
-            a.href = club.link;
-            a.classList.add('club-link');
+            a.href = `club.html?club=${encodeURIComponent(club.name)}`;
+            a.classList.add('club-button');
             li.appendChild(a);
             clubList.appendChild(li);
         });

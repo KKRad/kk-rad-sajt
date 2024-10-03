@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Statistika Kluba</title>
-    <!-- Uključivanje Supabase biblioteke -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Uključivanje vašeg JavaScript fajla -->
     <script src="club.js" defer></script>
     <style>
-        /* Dodajte stilove po potrebi */
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
@@ -85,7 +82,7 @@
         <h3>Lista igrača</h3>
         <ul id="players-list" class="player-list"></ul>
 
-        <!-- Sekcija za dodavanje igrača (samo za administratore) -->
+        <!-- Sekcija za dodavanje igrača (samo za trenere) -->
         <div id="add-player-section" class="hidden">
             <h3>Dodaj novog igrača</h3>
             <form id="add-player-form">
@@ -94,7 +91,7 @@
             </form>
         </div>
 
-        <!-- Sekcija za dodavanje treninga (samo za administratore) -->
+        <!-- Sekcija za dodavanje treninga (samo za trenere) -->
         <div id="add-training-section" class="hidden">
             <h3>Dodaj trening</h3>
             <form id="add-training-form">
@@ -108,7 +105,7 @@
             </form>
         </div>
 
-        <!-- Sekcija za dodavanje utakmice (samo za administratore) -->
+        <!-- Sekcija za dodavanje utakmice (samo za trenere) -->
         <div id="add-match-section" class="hidden">
             <h3>Dodaj utakmicu</h3>
             <form id="add-match-form">
@@ -121,7 +118,7 @@
             </form>
         </div>
 
-        <!-- Dugme za odjavu (samo za administratore) -->
+        <!-- Dugme za odjavu (samo za trenere) -->
         <button id="logoutButton" class="hidden">Odjavi se</button>
     </div>
 </body>

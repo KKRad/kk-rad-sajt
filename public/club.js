@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Proveri da li je korisnik prijavljen
     const { data: { user } } = await supabase.auth.getUser();
 
-    if (user) {
+    if (user && user.email === 'kkradbrcko9@gmail.com') {
         // Prikaži administratorske funkcije
         document.getElementById('add-player-section').classList.remove('hidden');
         document.getElementById('add-training-section').classList.remove('hidden');
@@ -165,9 +165,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Ostatak koda ostaje isti kao prethodno
-    // ...
-
     // Ažuriranje liste igrača
     function updatePlayerList(players) {
         const playerList = document.getElementById('players-list');
@@ -185,8 +182,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             li.appendChild(viewHistoryButton);
 
-            // Ako je korisnik prijavljen, dodaj dugme za brisanje
-            if (user) {
+            // Ako je korisnik prijavljen kao trener, dodaj dugme za brisanje
+            if (user && user.email === 'kkradbrcko9@gmail.com') {
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Obriši';
                 deleteButton.addEventListener('click', async () => {
@@ -199,7 +196,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         if (error) {
                             alert('Greška prilikom brisanja igrača: ' + error.message);
                         } else {
-                            alert('Igrač uspešno obrisan!');
                             loadPlayersAndStats();
                         }
                     }
@@ -375,3 +371,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 });
+
+
+

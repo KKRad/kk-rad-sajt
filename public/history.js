@@ -1,13 +1,10 @@
 // history.js
-
-// Vaš Supabase URL i Anon Public Key
 const supabaseUrl = 'https://piykumcyaqnyxwndozhb.supabase.co'; // Vaš Supabase URL
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpeWt1bWN5YXFueXh3bmRvemhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc2OTk2MTMsImV4cCI6MjA0MzI3NTYxM30.eqh0FPRGtqD3A9DLeJv6yZKXP6pnaygDTaaa2bgz3Xs'; // Ovdje ubacite vaš Anon Public Key
 
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Preuzimanje parametra 'player' iz URL-a
     const urlParams = new URLSearchParams(window.location.search);
     const playerId = urlParams.get('player');
 
@@ -17,7 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Učitavanje podataka o igraču
     const { data: player, error: playerError } = await supabase
         .from('players')
         .select('*')
@@ -32,7 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('player-name').textContent = `Istorija igrača: ${player.name}`;
 
-    // Učitavanje treninga igrača
     const { data: trainings, error: trainingsError } = await supabase
         .from('trainings')
         .select('*')
@@ -45,12 +40,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Priprema podataka za grafikon
     const dates = trainings.map(t => t.date);
     const throws = trainings.map(t => t.throws);
     const misses = trainings.map(t => t.misses);
 
-    // Kreiranje grafikona
     const ctx = document.getElementById('trainingChart').getContext('2d');
     const trainingChart = new Chart(ctx, {
         type: 'line',

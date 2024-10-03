@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Prijava</title>
-    <!-- Uključivanje Supabase biblioteke -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Uključivanje vašeg JavaScript fajla -->
     <script src="login.js" defer></script>
     <style>
-        /* Stilovi */
         body {
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
@@ -21,7 +18,7 @@
             padding: 20px;
             border-radius: 5px;
         }
-        h1, h2 {
+        h1 {
             text-align: center;
         }
         input[type="email"],
@@ -37,43 +34,20 @@
             background-color: #4CAF50;
             color: white;
             border: none;
-            margin: 8px 0;
+            margin-top: 8px;
             cursor: pointer;
         }
         button:hover {
             background-color: #45a049;
         }
-        .switch {
-            text-align: center;
-            margin-top: 10px;
-        }
-        .switch a {
-            color: #4CAF50;
-            text-decoration: none;
-        }
     </style>
 </head>
 <body>
-
-<div class="container" id="login-container">
-    <h1>Prijava</h1>
-    <input type="email" id="login-email" placeholder="Email" required />
-    <input type="password" id="login-password" placeholder="Lozinka" required />
-    <button id="loginButton">Prijavi se</button>
-    <div class="switch">
-        <p>Nemate nalog? <a href="#" id="show-signup">Registrujte se</a></p>
+    <div class="container">
+        <h1>Prijava</h1>
+        <input type="email" id="login-email" placeholder="Email" required />
+        <input type="password" id="login-password" placeholder="Lozinka" required />
+        <button id="loginButton">Prijavi se</button>
     </div>
-</div>
-
-<div class="container" id="signup-container" style="display: none;">
-    <h2>Registracija</h2>
-    <input type="email" id="signup-email" placeholder="Email" required />
-    <input type="password" id="signup-password" placeholder="Lozinka" required />
-    <button id="signupButton">Registruj se</button>
-    <div class="switch">
-        <p>Već imate nalog? <a href="#" id="show-login">Prijavite se</a></p>
-    </div>
-</div>
-
 </body>
 </html>
